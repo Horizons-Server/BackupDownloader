@@ -1,0 +1,17 @@
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v3
+      - name: Build Image
+        run: docker build --tag horizonsbackups:latest .
+      - name: Tag Image
+        run: docker image tag horizonsbackups ${{ secrets.VPS_HOST }}:5000/horizonsbackups
+      - name: Login to Registry
+        run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin https://${{ secrets.VPS_HOST }}:5000
+      - name: Push to Registry
+        run: docker push ${{ secrets.VPS_HOST }}:5000/horizonsbackups
